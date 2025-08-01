@@ -1,97 +1,179 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# SmartMoney React Native App Setup Guide
 
-# Getting Started
+## 📱 Project Overview
+This is a mobile money management app for Android that tracks and analyzes financial transactions using AI (Gemma 3n). The app provides insights into mobile money usage patterns.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🚀 Quick Start
 
-## Step 1: Start Metro
+### 1. Install Dependencies
+```bash
+# Navigate to your project directory
+cd your-project-name
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+# Install required packages
+npm install @react-navigation/native @react-navigation/stack
+npm install react-native-screens react-native-safe-area-context
+npm install react-native-vector-icons
 
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+# For Android
+npx react-native link react-native-vector-icons
 ```
 
-## Step 2: Build and run your app
+### 2. Android Setup (react-native-screens)
+Add to `android/app/src/main/java/.../MainActivity.java`:
+```java
+import android.os.Bundle;
+// Add this import
+import com.swmansion.rnscreens.RNScreens;
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+public class MainActivity extends ReactActivity {
+  // Add this method
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(null);
+  }
+}
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+### 3. Create Directory Structure
+```
+src/
+├── components/
+│   ├── common/
+│   │   └── LoadingScreen.jsx
+│   ├── home/
+│   │   ├── SummaryCards.jsx
+│   │   ├── AccountsList.jsx
+│   │   └── TransactionsList.jsx
+├── screens/
+│   ├── SplashScreen.jsx
+│   ├── OnboardingScreen.jsx
+│   ├── HomeScreen.jsx
+│   ├── TransactionHistoryScreen.jsx
+│   └── TransactionDetailScreen.jsx
+├── navigation/
+│   └── AppNavigator.jsx
+└── utils/
+    ├── colors.js
+    ├── formatters.js
+    └── mockData.js
 ```
 
-Then, and every time you update your native dependencies, run:
+### 4. Replace App.jsx
+Replace your existing App.tsx/App.js with the provided App.jsx file.
 
-```sh
-bundle exec pod install
+### 5. Copy All Components
+Copy all the provided component files into their respective directories.
+
+## 🎨 Key Features
+
+### ✅ Implemented Features
+- **Splash Screen** - App loading with SmartMoney branding
+- **Onboarding** - Welcome screen with illustration
+- **Home Dashboard** - Financial summary with revenue/transfers/expenses
+- **Mobile Accounts** - Display of Orange Money and MTN MoMo accounts
+- **Transaction History** - Phone credit purchase history
+- **Transaction Details** - Detailed view with SMS origin
+- **AI Processing Screen** - Loading screen for Gemma 3 integration
+
+### 🎯 App Flow
+1. **SplashScreen** → Shows app logo and name
+2. **OnboardingScreen** → Welcome message and get started
+3. **HomeScreen** → Main dashboard with:
+   - Weekly summary cards (Revenue, Transfers, Expenses)
+   - Mobile money accounts list
+   - Transaction categories list
+4. **TransactionHistoryScreen** → Phone credit transactions
+5. **TransactionDetailScreen** → Individual transaction details
+
+## 🔧 Customization
+
+### Colors
+Modify `src/utils/colors.js` to change the app's color scheme:
+```javascript
+export const colors = {
+  primary: '#FF8A80',     // Main pink/coral color
+  secondary: '#4CAF50',   // Success green
+  warning: '#FF9800',     // Orange for transfers
+  danger: '#F44336',      // Red for expenses
+  // ... other colors
+};
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+### Mock Data
+Update `src/utils/mockData.js` to match your actual data structure:
+```javascript
+export const mockData = {
+  summary: {
+    revenue: 52150,
+    transfer: 28230,
+    expense: 34180,
+  },
+  accounts: [
+    // Your mobile money accounts
+  ],
+  transactions: [
+    // Your transaction data
+  ],
+};
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## 🤖 AI Integration Points
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Where to Add Gemma 3n
+1. **SMS Processing** - In `TransactionDetailScreen.jsx`, the SMS text analysis
+2. **Transaction Categorization** - In `formatters.js`, for auto-categorizing transactions
+3. **Spending Insights** - In `HomeScreen.jsx`, for generating financial insights
+4. **Fraud Detection** - In transaction processing for security alerts
 
-## Step 3: Modify your app
+### Example Integration
+```javascript
+// Example AI processing function
+const processTransactionWithAI = async (smsText) => {
+  // Show loading screen
+  setIsProcessing(true);
+  
+  try {
+    // Call your Gemma 3n API
+    const analysis = await analyzeTransactionSMS(smsText);
+    return analysis;
+  } catch (error) {
+    console.error('AI processing error:', error);
+  } finally {
+    setIsProcessing(false);
+  }
+};
+```
 
-Now that you have successfully run the app, let's make changes!
+## 📱 Running the App
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### Development
+```bash
+# Start Metro bundler
+npx react-native start
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+# Run on Android
+npx react-native run-android
+```
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+### Build for Production
+```bash
+# Generate release APK
+cd android
+./gradlew assembleRelease
 
-## Congratulations! :tada:
+# APK will be at: android/app/build/outputs/apk/release/app-release.apk
+```
 
-You've successfully run and modified your React Native App. :partying_face:
+## 🎯 Competition Notes
 
-### Now what?
+This app showcases Gemma 3n usage through:
+- **Smart SMS Analysis** - AI processes transaction SMS messages
+- **Intelligent Categorization** - Auto-categorizes transactions
+- **Financial Insights** - Provides spending pattern analysis
+- **User-Friendly Interface** - Clean, modern mobile money management
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## 🐛 Troubleshooting
 
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### Common Issues
+1. **Navigation errors
