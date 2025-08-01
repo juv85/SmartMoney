@@ -1,0 +1,14 @@
+CU check if SMS is transaction
+
+1- Le sms est envoye au modele imperatif
+2- Le model retourne le score de ressemblance du sms a une trans. financiere
+3- Le score est compare au score d'acceptation
+4- La methode retourne true ou false pour designer si le sms est une trans. financiere ou pas.
+
+
+CU control key extracted values
+
+1- Le sms est envoye dans le modele d'extraction
+2- Le modele d'extraction retourne une liste d'objet contenant les valeurs extraite et leurs score d'exactitude
+3- Le score des valeures de frais, montant et solde sont compare a leurs score d'acceptation respectifs
+4- La methode 

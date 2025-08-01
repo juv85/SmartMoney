@@ -10,8 +10,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "fs-extra": "^11.3.0",
     "react": "19.0.0",
-    "react-native": "0.79.5"
+    "react-native": "0.79.5",
+    "react-native-fs": "2.18.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

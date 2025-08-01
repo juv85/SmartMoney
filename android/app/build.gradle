@@ -116,4 +116,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+	
+	// For Gemma/MediaPipe
+    implementation 'com.google.mediapipe:tasks-genai:0.10.24'
+    implementation 'com.google.mediapipe:tasks-core:0.10.21'
 }
