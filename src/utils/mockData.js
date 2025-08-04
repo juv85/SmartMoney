@@ -1,0 +1,126 @@
+export const mockData = {
+    summary: {
+      revenue: 52150,
+      transfer: 28230,
+      expense: 34180,
+    },
+    
+    accounts: [
+      {
+        id: 1,
+        name: 'Orange Money',
+        number: '+237 699 88 77 66',
+        balance: 2000,
+        provider: 'orange',
+      },
+      {
+        id: 2,
+        name: 'MTN MoMo',
+        number: '+237 677 88 99 00',
+        balance: 3000,
+        provider: 'mtn',
+      },
+    ],
+    
+    transactions: [
+      {
+        id: 1,
+        type: 'incoming_transfer',
+        title: 'Transfert entrant',
+        amount: 23000,
+        category: 'revenue',
+        icon: 'arrow-down-left',
+      },
+      {
+        id: 2,
+        type: 'withdrawal',
+        title: 'Retrait',
+        amount: 17230,
+        category: 'transfer',
+        icon: 'refresh-cw',
+      },
+      {
+        id: 3,
+        type: 'outgoing_transfer',
+        title: 'Transfert sortant',
+        amount: 14000,
+        category: 'expense',
+        icon: 'arrow-up-right',
+      },
+      {
+        id: 4,
+        type: 'deposit',
+        title: 'Dépôt',
+        amount: 9000,
+        category: 'transfer',
+        icon: 'refresh-cw',
+      },
+      {
+        id: 5,
+        type: 'mobile_payment',
+        title: 'Paiements mobile',
+        amount: 7800,
+        category: 'expense',
+        icon: 'smartphone',
+      },
+      {
+        id: 6,
+        type: 'phone_credit',
+        title: 'Téléphone',
+        amount: 5300,
+        category: 'expense',
+        icon: 'phone',
+      },
+    ],
+    
+    phoneTransactions: [
+      {
+        id: 1,
+        number: '+237 677 88 99 00',
+        amount: 2000,
+        date: '16 Juil. 2025 à 13h10',
+        provider: 'mtn',
+      },
+      {
+        id: 2,
+        number: '+237 651 51 52 52',
+        amount: 500,
+        date: '16 Juil. 2025 à 10h10',
+        provider: 'mtn',
+      },
+      {
+        id: 3,
+        number: '+237 651 51 52 52',
+        amount: 300,
+        date: '16 Juil. 2025 à 07h03',
+        provider: 'mtn',
+      },
+      {
+        id: 4,
+        number: '+237 699 88 77 66',
+        amount: 2000,
+        date: '15 Juil. 2025 à 19h20',
+        provider: 'orange',
+      },
+      {
+        id: 5,
+        number: '+237 677 88 99 00',
+        amount: 1000,
+        date: '15 Juil. 2025 à 17h00',
+        provider: 'mtn',
+      },
+    ],
+    
+    transactionDetail: {
+      id: 1,
+      amount: 2000,
+      type: 'expense',
+      account: '+237 677 88 99 00',
+      provider: 'MTN MoMo',
+      date: '16 Juil. 2025 à 13h10',
+      fees: 0,
+      direction: 'Out',
+      transactionId: '19996000385',
+      smsOrigin: `Hello, A transaction of 5000 XAF by INTOUCH CASHIN CASHOUT (237677788045) on your mobile-money account successfully completed at 2022-07-20 13:05:12. The amount was subject to a discount of 0 and coupons worth 0. Message from debit receiver: paiement 5000 670059946. Your new balance:7835 XAF. Fee was 100 XAF, loyalty fee was 0 and loyalty reward was 0. Financial Transaction Id: 5835047181. External Transaction Id: 1680012021713.`,
+    },
+  };

@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
 
-const App = () => {
+const App2 = () => {
   return (
     <NavigationContainer>
       <StatusBar barStyle="light-content" backgroundColor="#FF8A80" />
@@ -12,4 +12,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default App2;
