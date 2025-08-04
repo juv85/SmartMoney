@@ -24,34 +24,34 @@ const AppNavigator = () => {
       <Stack.Screen 
         name="TransactionHistory" 
         component={TransactionHistoryScreen}
-        options={{
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: '#FF8A80',
-          },
-          headerTintColor: '#fff',
-          headerTitle: 'Téléphone',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-            fontSize: 18,
-          },
-        }}
+        // options={{
+        //   headerShown: true,
+        //   headerStyle: {
+        //     backgroundColor: '##FF9E8C',
+        //   },
+        //   headerTintColor: '#fff',
+        //   headerTitle: 'Téléphone',
+        //   headerTitleStyle: {
+        //     fontWeight: 'bold',
+        //     fontSize: 18,
+        //   },
+        // }}
       />
       <Stack.Screen 
         name="TransactionDetail" 
         component={TransactionDetailScreen}
-        options={{
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: '#FF8A80',
-          },
-          headerTintColor: '#fff',
-          headerTitle: 'Téléphone',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-            fontSize: 18,
-          },
-        }}
+        // options={{
+        //   headerShown: true,
+        //   headerStyle: {
+        //     backgroundColor: '##FF9E8C',
+        //   },
+        //   headerTintColor: '#fff',
+        //   headerTitle: 'Téléphone',
+        //   headerTitleStyle: {
+        //     fontWeight: 'bold',
+        //     fontSize: 18,
+        //   },
+        // }}
       />
     </Stack.Navigator>
   );

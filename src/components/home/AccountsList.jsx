@@ -10,19 +10,19 @@ import { colors } from '../../utils/colors';
 import { formatCurrency, formatPhoneNumber } from '../../utils/formatters';
 import { imgMoMo, imgOM } from '../../utils/images';
 
-const AccountCard = ({ account }) => {
+export const AccountCard = ({ account, cardStyle }) => {
 
   return (
-    <View style={styles.accountCard}>
+    <View style={[styles.accountCard, cardStyle]}>
       <View style={styles.accountHeader}>
         {/* <View style={[styles.providerIcon, { backgroundColor: getProviderColor(account.provider) }]}> */}
         <View style={[styles.providerIcon]}>
-          <Image style={styles.providerIcon} source={account.provider == 'orange' ? imgOM : imgMoMo } />
+          <Image style={styles.providerIcon} source={account?.provider == 'orange' ? imgOM : imgMoMo } />
           {/* <Text style={styles.providerIconText}>{getProviderIcon(account.provider)}</Text> */}
         </View>
         <View style={styles.accountInfo}>
-          <Text style={styles.accountNumber}>{formatPhoneNumber(account.number)}</Text>
-          <Text style={styles.accountName}>{account.name}</Text>
+          <Text style={styles.accountNumber}>{formatPhoneNumber(account?.number)}</Text>
+          <Text style={styles.accountName}>{account?.name}</Text>
         </View>
       </View>
     </View>

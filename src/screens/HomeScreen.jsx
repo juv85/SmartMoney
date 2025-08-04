@@ -6,6 +6,7 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { colors } from '../utils/colors';
 import { formatCurrency } from '../utils/formatters';
@@ -13,6 +14,7 @@ import { mockData } from '../utils/mockData';
 import SummaryCards from '../components/home/SummaryCards';
 import AccountsList from '../components/home/AccountsList';
 import TransactionsList from '../components/home/TransactionsList';
+import { imgFilter, imgRefresh } from '../utils/images';
 
 const HomeScreen = ({ navigation }) => {
   return (
@@ -22,12 +24,14 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Accueil</Text>
           <TouchableOpacity style={styles.refreshButton}>
-            <Text style={styles.refreshText}>🔄</Text>
+            <Image style={styles.refreshIcon} source={imgRefresh} />
+            {/* <Text style={styles.refreshText}>🔄</Text> */}
           </TouchableOpacity>
         </View>
 
         {/* Period Selector */}
         <View style={styles.periodContainer}>
+          <Image source={imgFilter} style={styles.filterIcon} />
           <Text style={styles.periodText}>Cette semaine</Text>
         </View>
 
@@ -63,7 +67,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingVertical: 10,
     backgroundColor: colors.white,
   },
   headerTitle: {
@@ -72,18 +76,26 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   refreshButton: {
-    padding: 8,
+    // padding: 8,
   },
-  refreshText: {
-    fontSize: 18,
+  refreshIcon: {
+    width: 25,
+    height: 25,
+  },
+  filterIcon: {
+    width: 20,
+    height: 20,
   },
   periodContainer: {
     alignItems: 'center',
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+    paddingHorizontal: 20,
     paddingVertical: 10,
     backgroundColor: colors.white,
   },
   periodText: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.gray,
   },
   section: {

@@ -62,12 +62,15 @@ const getClassIcon = (transaction) => {
 
 const TransactionsList = ({ transactions, navigation }) => {
   const handleTransactionPress = (transaction) => {
-    if (transaction.type === 'phone_credit') {
-      navigation.navigate('TransactionHistory');
-    } else {
-      // Navigate to other transaction details if needed
-      console.log('Transaction pressed:', transaction.title);
-    }
+    navigation.navigate('TransactionHistory');
+
+    // if (transaction.type === 'phone_credit') {
+    //   navigation.navigate('TransactionHistory');
+    // } else {
+    //   navigation.navigate('TransactionHistory');
+    //   // Navigate to other transaction details if needed
+    //   console.log('Transaction pressed:', transaction.title);
+    // }
   };
 
   return (
