@@ -39,8 +39,12 @@ export class PermissionManager {
       const hasLegacyWrite = await PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
       );
+      /* const hasLegacyManage = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.MANAGE_EXTERNAL_STORAGE
+      ); */
 
       return hasLegacyRead && hasLegacyWrite;
+      // return hasLegacyRead && hasLegacyWrite && hasLegacyManage;
     } catch (error) {
       console.error("Error checking storage permission:", error);
       return false;
@@ -64,6 +68,7 @@ export class PermissionManager {
       const permissions = [
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        // PermissionsAndroid.PERMISSIONS.MANAGE_EXTERNAL_STORAGE,
       ];
 
       const granted = await PermissionsAndroid.requestMultiple(permissions);
@@ -72,7 +77,10 @@ export class PermissionManager {
         granted["android.permission.READ_EXTERNAL_STORAGE"] ===
           PermissionsAndroid.RESULTS.GRANTED &&
         granted["android.permission.WRITE_EXTERNAL_STORAGE"] ===
-          PermissionsAndroid.RESULTS.GRANTED
+          PermissionsAndroid.RESULTS.GRANTED 
+		  /* &&
+        granted["android.permission.MANAGE_EXTERNAL_STORAGE"] ===
+          PermissionsAndroid.RESULTS.GRANTED */
       );
     } catch (error) {
       console.error("Error requesting storage permission:", error);
