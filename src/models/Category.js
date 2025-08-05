@@ -1,15 +1,15 @@
 // Category model for transaction categorization
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 import { getDatabase } from './index';
 
 class Category {
   constructor(data = {}) {
-    this.id = data.id || null;
+    this.id = data.id || uuidv4();
     this.name = data.name || '';
-    this.type = data.type || 'expense'; // 'revenu', 'depense' oir 'virement'
-    this.color = data.color || '#007AFF';
-    this.icon = data.icon || 'other';
-    this.isDefault = data.is_default !== undefined ? data.is_default : data.isDefault !== undefined ? data.isDefault : false;
-    this.createdAt = data.created_at || data.createdAt || null;
+    this.type = data.type || 'depense'; // 'revenu', 'depense', or 'virement'
+    this.createdAt = data.created_at || data.createdAt || new Date().toISOString();
+    this.updatedAt = data.updated_at || data.updatedAt || new Date().toISOString();
   }
 
   // Create a new category
@@ -92,11 +92,11 @@ class Category {
   static findAll(type = null) {
     return new Promise((resolve, reject) => {
       const db = getDatabase();
-      let query = 'SELECT * FROM categories ORDER BY is_default DESC, name ASC';
-      let params = [];
+      let query = 'SELECT * FROM categories ORDER BY name ASC';
+      let params = [''];
 
       if (type) {
-        query = 'SELECT * FROM categories WHERE type = ? ORDER BY is_default DESC, name ASC';
+        query = 'SELECT * FROM categories WHERE type = ? ORDER BY name ASC';
         params = [type];
       }
 

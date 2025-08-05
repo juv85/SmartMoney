@@ -21,6 +21,8 @@ import {
   Modal,
   ActivityIndicator,
   NativeModules,
+  Alert,
+  Platform,
 } from 'react-native';
 
 import {
@@ -36,6 +38,7 @@ import SimplifiedGemmaBridge from "./lib/GemmaBridge";
 import RNFS from "react-native-fs"
 import { ensureStoragePermission } from './src/utils/permissions';
 import { useGemmaMetrics, useGemmaModel } from './lib/hooks';
+import PermissionManager from './lib/managers/PermissionManager';
 
 const { HelloModule } = NativeModules;
 const { GemmaBridgeModule } = NativeModules;
@@ -78,6 +81,7 @@ function App(): React.JSX.Element {
   const [message, setMessage] = useState('');
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [response, setResponse] = useState('');
   const [conversation, setConversation] = useState<
     Array<{
       type: "user" | "assistant";
@@ -139,7 +143,7 @@ function App(): React.JSX.Element {
     //   const result = await GemmaBridgeModule.loadModel();
 	  // console.log(result);
     setMessage("Attempting to load model");
-      return loadGemma3n();
+      return loadGemma();
     } catch (e) {
       setMessage('Error calling Gemma Model: ' + e.message);
     }
@@ -242,7 +246,7 @@ Current Performance:
 
 Session Stats:
 • Average tokens/sec: ${performanceStats.averageTokensPerSecond.toFixed(1)}
-• Best tokens/sec: ${performanceStats.bestTokensPerSecond.toFixed(1)}
+• Best tokens/sec: ${performanceStats.averageTokensPerSecond.toFixed(1)}
 • Session duration: ${Math.round(realtimeMetrics.sessionDuration / 1000)}s
 
 Device:
@@ -429,6 +433,13 @@ Device:
             <Text style={styles.actionButtonText}>
               {isLoading ? "Loading..." : "🔄 Load Model"}
             </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={ensureStoragePermission}
+          >
+            <Text style={styles.actionButtonText}>Permissions</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

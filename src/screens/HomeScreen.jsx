@@ -17,13 +17,13 @@ import SummaryCards from '../components/home/SummaryCards';
 import AccountsList from '../components/home/AccountsList';
 import TransactionsList from '../components/home/TransactionsList';
 import { imgFilter, imgRefresh } from '../utils/images';
-import { Account, Transaction } from '../models';
+import { Account, Transaction, Category } from '../models';
 import { createSyntheticData, testModelFunctions } from '../utils/syntheticData';
 
 const HomeScreen = ({ navigation }) => {
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(mockData.summary);
 
   useEffect(() => {
@@ -35,26 +35,31 @@ const HomeScreen = ({ navigation }) => {
       setLoading(true);
       
       // Load accounts
-      const accountsData = await Account.findAll(true); // active only
+      const accountsData = await Account.findAll(); // active only
       setAccounts(accountsData.length > 0 ? accountsData : mockData.accounts);
+      console.log('accountsData', accountsData)
       
       // Load recent transactions
-      const recentTransactions = await Transaction.getRecent(10);
+      const recentTransactions = await Transaction.findAll();
       setTransactions(recentTransactions.length > 0 ? recentTransactions : mockData.transactions);
-      
+      console.log('recentTransactions', recentTransactions)
+
+      const categories = await Category.findAll('deposit');
+      console.log("categories", categories)
       // Calculate summary from real data if available
-      if (recentTransactions.length > 0) {
-        const stats = await Transaction.getStatistics();
-        setSummary({
-          totalBalance: accountsData.reduce((sum, acc) => sum + acc.balance, 0),
-          monthlyIncome: stats.income?.total || 0,
-          monthlyExpenses: stats.expense?.total || 0,
-          transactionCount: stats.income?.count + stats.expense?.count || 0
-        });
-      }
-      
+      // if (recentTransactions.length > 0) {
+      //   const stats = await Transaction.getStatistics();
+      //   setSummary({
+      //     totalBalance: accountsData.reduce((sum, acc) => sum + acc.balance, 0),
+      //     monthlyIncome: stats.income?.total || 0,
+      //     monthlyExpenses: stats.expense?.total || 0,
+      //     transactionCount: stats.income?.count + stats.expense?.count || 0
+      //   });
+      // }
+      // setLoading(false);
+
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('Error loading data: ', error);
       // Fallback to mock data
       setAccounts(mockData.accounts);
       setTransactions(mockData.transactions);

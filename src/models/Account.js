@@ -1,17 +1,16 @@
 // Account model for managing mobile money accounts
 import { getDatabase } from './index';
+// UUID is now imported in index.js
 
 class Account {
   constructor(data = {}) {
+    // Don't generate a new ID here, let the database handle it with AUTOINCREMENT
     this.id = data.id || null;
-    this.name = data.name || '';
     this.phoneNumber = data.phone_number || data.phoneNumber || '';
-    this.provider = data.provider || '';
-    this.balance = data.balance || 0;
-    this.currency = data.currency || 'FCFA';
-    this.isActive = data.is_active !== undefined ? data.is_active : data.isActive !== undefined ? data.isActive : true;
-    this.createdAt = data.created_at || data.createdAt || null;
-    this.updatedAt = data.updated_at || data.updatedAt || null;
+    this.operatorName = data.operator_name || data.operatorName || '';
+    this.currentBalance = data.current_balance || data.currentBalance || 0;
+    this.createdAt = data.created_at || data.createdAt || new Date().toISOString();
+    this.updatedAt = data.updated_at || data.updatedAt || new Date().toISOString();
   }
 
   // Create a new account
@@ -22,12 +21,22 @@ class Account {
 
       db.transaction(tx => {
         tx.executeSql(
-          `INSERT INTO accounts (name, phone_number, provider, balance, currency, is_active) 
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [account.name, account.phoneNumber, account.provider, account.balance, account.currency, account.isActive],
+          'INSERT INTO accounts (phone_number, operator_name, current_balance) VALUES (?, ?, ?)',
+          [account.phoneNumber, account.operatorName, account.currentBalance],
           (_, result) => {
-            account.id = result.insertId;
-            resolve(account);
+            // Get the inserted row to ensure we have all fields
+            tx.executeSql(
+              'SELECT * FROM accounts WHERE rowid = ?',
+              [result.insertId],
+              (_, { rows }) => {
+                const savedAccount = new Account(rows.item(0));
+                resolve(savedAccount);
+              },
+              (_, error) => {
+                console.error('Error fetching created account:', error);
+                reject(error);
+              }
+            );
           },
           (_, error) => {
             console.error('Error creating account:', error);
@@ -47,9 +56,9 @@ class Account {
         tx.executeSql(
           'SELECT * FROM accounts WHERE id = ?',
           [id],
-          (_, result) => {
-            if (result.rows.length > 0) {
-              const accountData = result.rows.item(0);
+          (_, { rows }) => {
+            if (rows.length > 0) {
+              const accountData = rows.item(0);
               resolve(new Account(accountData));
             } else {
               resolve(null);
@@ -73,16 +82,16 @@ class Account {
         tx.executeSql(
           'SELECT * FROM accounts WHERE phone_number = ?',
           [phoneNumber],
-          (_, result) => {
-            if (result.rows.length > 0) {
-              const accountData = result.rows.item(0);
+          (_, { rows }) => {
+            if (rows.length > 0) {
+              const accountData = rows.item(0);
               resolve(new Account(accountData));
             } else {
               resolve(null);
             }
           },
           (_, error) => {
-            console.error('Error finding account by phone:', error);
+            console.error('Error finding account by phone number:', error);
             reject(error);
           }
         );

@@ -19,10 +19,12 @@
     "react-native": "0.79.5",
     "react-native-fs": "2.18.0",
     "react-native-gesture-handler": "^2.27.2",
+    "react-native-get-random-values": "^1.11.0",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.13.1",
     "react-native-sms-receiver": "^1.0.0",
-    "react-native-sqlite-storage": "^6.0.1"
+    "react-native-sqlite-storage": "^6.0.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -23,7 +23,7 @@ export const AccountCard = ({ account, cardStyle, onPress }) => {
       <View style={styles.accountHeader}>
         {/* <View style={[styles.providerIcon, { backgroundColor: getProviderColor(account.provider) }]}> */}
         <View style={[styles.providerIcon]}>
-          <Image style={styles.providerIcon} source={account?.provider.toLowerCase() == 'orange' ? imgOM : imgMoMo } />
+          <Image style={styles.providerIcon} source={account?.provider?.toLowerCase() == 'orange' ? imgOM : imgMoMo } />
           {/* <Text style={styles.providerIconText}>{getProviderIcon(account.provider)}</Text> */}
         </View>
         <View style={styles.accountInfo}>
