@@ -14,7 +14,7 @@ const SummaryCard = ({ title, amount, color, backgroundColor, icon }) => (
       <Text style={styles.cardTitle}>{title}</Text>
     </View>
     <Text style={[styles.cardAmount, { color }]}>
-      {formatCurrency(amount)}
+      {/* {formatCurrency(amount)} */}
     </Text>
     <Text style={styles.currency}>{"FCFA"}</Text>
   </View>

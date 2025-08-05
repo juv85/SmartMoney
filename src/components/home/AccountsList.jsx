@@ -5,35 +5,55 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import { colors } from '../../utils/colors';
 import { formatCurrency, formatPhoneNumber } from '../../utils/formatters';
 import { imgMoMo, imgOM } from '../../utils/images';
 
-export const AccountCard = ({ account, cardStyle }) => {
+export const AccountCard = ({ account, cardStyle, onPress }) => {
+  const handlePress = () => {
+    if (onPress) {
+      onPress(account);
+    }
+  };
 
-  return (
+  const CardContent = (
     <View style={[styles.accountCard, cardStyle]}>
       <View style={styles.accountHeader}>
         {/* <View style={[styles.providerIcon, { backgroundColor: getProviderColor(account.provider) }]}> */}
         <View style={[styles.providerIcon]}>
-          <Image style={styles.providerIcon} source={account?.provider == 'orange' ? imgOM : imgMoMo } />
+          <Image style={styles.providerIcon} source={account?.provider.toLowerCase() == 'orange' ? imgOM : imgMoMo } />
           {/* <Text style={styles.providerIconText}>{getProviderIcon(account.provider)}</Text> */}
         </View>
         <View style={styles.accountInfo}>
-          <Text style={styles.accountNumber}>{formatPhoneNumber(account?.number)}</Text>
-          <Text style={styles.accountName}>{account?.name}</Text>
+          <Text style={styles.accountNumber}>{formatPhoneNumber(account?.number || account?.phoneNumber)}</Text>
+          <Text style={styles.accountName}>{account?.name || account?.accountName}</Text>
         </View>
       </View>
     </View>
   );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
+        {CardContent}
+      </TouchableOpacity>
+    );
+  }
+
+  return CardContent;
 };
 
-const AccountsList = ({ accounts }) => {
+const AccountsList = ({ accounts, onAccountPress }) => {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.container}>
       {accounts.map((account) => (
-        <AccountCard key={account.id} account={account} />
+        <AccountCard 
+          key={account.id} 
+          account={account} 
+          onPress={onAccountPress}
+        />
       ))}
     </ScrollView>
   );

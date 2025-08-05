@@ -62,7 +62,7 @@ const getClassIcon = (transaction) => {
 
 const TransactionsList = ({ transactions, navigation }) => {
   const handleTransactionPress = (transaction) => {
-    navigation.navigate('TransactionHistory');
+    navigation.navigate('TransactionHistory', {categoryId: transaction.categoryId});
 
     // if (transaction.type === 'phone_credit') {
     //   navigation.navigate('TransactionHistory');
