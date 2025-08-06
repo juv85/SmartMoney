@@ -72,7 +72,8 @@ class GemmaBridgeModule(private val reactContext: ReactApplicationContext) :
                     if (!internalFile.exists()) {
                         modelFile.copyTo(internalFile, overwrite = true)
                     }
-                    baseOptionsBuilder.setModelAssetPath("gemma.task")
+                    // Use the internal file path
+                    baseOptionsBuilder.setModelAssetPath(internalFile.absolutePath)
                 } else {
                     // Assume it's an asset path
                     baseOptionsBuilder.setModelAssetPath(actualPath)
@@ -86,10 +87,10 @@ class GemmaBridgeModule(private val reactContext: ReactApplicationContext) :
                 }
 
                 val baseOptions = baseOptionsBuilder.build()
-                val options =
-                        // LlmInference.LlmInferenceOptions.builder().setBaseOptions(baseOptions).build()
-                        // LlmInference.LlmInferenceOptions.builder().setTemperature(0.5f).build()
-                        LlmInference.LlmInferenceOptions.builder().build()
+                val options = LlmInference.LlmInferenceOptions.builder()
+                        .setModelPath(actualPath)
+                        .setMaxTokens(2000)
+                        .build()
 
                 // Load model
                 llmInference = LlmInference.createFromOptions(reactContext, options)

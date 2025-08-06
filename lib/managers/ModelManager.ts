@@ -167,12 +167,13 @@ export class ModelManager {
   // Load model on Android (external storage)
   private async loadAndroidModel(modelFileName: string): Promise<boolean> {
     console.log("Loading Android external model:", modelFileName);
-
+	// await this.permissionManager.requestStoragePermission();
     // Check permissions first
     const hasPermission = await this.permissionManager.hasStoragePermission();
     if (!hasPermission) {
       console.log("Storage permission not granted, requesting...");
       const permissionGranted =
+       
         await this.permissionManager.requestStoragePermission();
       if (!permissionGranted) {
         throw new Error("Storage permission is required to load the model");
@@ -186,9 +187,9 @@ export class ModelManager {
     const useGPU = this.config.useGPU && deviceInfo.supportsGPU;
 
     // Check if model file exists in external storage
-    let modelPathr = await this.fileManager.getModelPath(modelFileName);
-	console.log("model path to load: ", modelPathr)
-    if (!modelPathr) {
+    let modelPath = await this.fileManager.getModelPath(modelFileName);
+	console.log("model path to load: ", modelPath)
+    if (!modelPath) {
 		console.log("path not found")
       // Model not found in Documents folder
       throw new Error(
@@ -196,7 +197,7 @@ export class ModelManager {
       );
     }
 
-    this.updateStatus({ loadProgress: 0.3, modelPathr });
+    this.updateStatus({ loadProgress: 0.3, modelPath });
 
     // Validate model file
     const isValid = await this.fileManager.validateModel(modelFileName);
@@ -207,7 +208,7 @@ export class ModelManager {
     this.updateStatus({ loadProgress: 0.5 });
 
     // Load model with retry logic
-    const success = await this.loadModelWithRetry(modelPathr, useGPU);
+    const success = await this.loadModelWithRetry(modelPath, useGPU);
 
     if (success) {
       this.updateStatus({
@@ -231,23 +232,22 @@ export class ModelManager {
 
   // Load model with retry logic
   private async loadModelWithRetry(
-    modelPathq: string,
+    modelPath: string,
     useGPU: boolean
   ): Promise<boolean> {
     const startTime = Date.now();
 
     for (let attempt = 1; attempt <= this.config.retryAttempts; attempt++) {
       try {
-	  modelPathq = "/storage/emulated/0/Documents/gemma.task"
-	  console.log(
-          `Loading model path -> ${modelPathq}`
+        console.log(
+          `Loading model path -> ${modelPath}`
         );
 		
         console.log(
           `Loading model attempt ${attempt}/${this.config.retryAttempts}`
         );
 
-        const result = await GemmaBridgeModule.loadModel("./", useGPU);
+        const result = await GemmaBridgeModule.loadModel(modelPath, useGPU);
 
         if (result) {
           const loadTime = Date.now() - startTime;
@@ -299,7 +299,7 @@ export class ModelManager {
           isLoading: false,
           loadProgress: 0,
           error: null,
-          modelPath: null,
+          modelPath: "",
           backend: null,
           loadTime: null,
         });

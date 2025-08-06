@@ -28,7 +28,7 @@ export function useGemmaModel(): UseGemmaModelReturn {
     isLoading: false,
     loadProgress: 0,
     error: null,
-    modelPath: null,
+    modelPath: "",
     backend: null,
     loadTime: null
   });

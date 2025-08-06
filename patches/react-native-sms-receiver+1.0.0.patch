@@ -1,0 +1,48 @@
+diff --git a/node_modules/react-native-sms-receiver/android/build.gradle b/node_modules/react-native-sms-receiver/android/build.gradle
+index fc0a7f6..03bf365 100644
+--- a/node_modules/react-native-sms-receiver/android/build.gradle
++++ b/node_modules/react-native-sms-receiver/android/build.gradle
+@@ -21,7 +21,7 @@ buildscript {
+ }
+ 
+ apply plugin: 'com.android.library'
+-apply plugin: 'maven'
++apply plugin: 'maven-publish'
+ 
+ android {
+     compileSdkVersion safeExtGet('compileSdkVersion', DEFAULT_COMPILE_SDK_VERSION)
+@@ -80,17 +80,17 @@ afterEvaluate { project ->
+     task androidJavadoc(type: Javadoc) {
+         source = android.sourceSets.main.java.srcDirs
+         classpath += files(android.bootClasspath)
+-        classpath += files(project.getConfigurations().getByName('compile').asList())
++        // classpath += files(project.getConfigurations().getByName('compile').asList())
+         include '**/*.java'
+     }
+ 
+     task androidJavadocJar(type: Jar, dependsOn: androidJavadoc) {
+-        classifier = 'javadoc'
++        archiveClassifier  = 'javadoc'
+         from androidJavadoc.destinationDir
+     }
+ 
+     task androidSourcesJar(type: Jar) {
+-        classifier = 'sources'
++        archiveClassifier  = 'sources'
+         from android.sourceSets.main.java.srcDirs
+         include '**/*.java'
+     }
+@@ -111,9 +111,11 @@ afterEvaluate { project ->
+ 
+     task installArchives(type: Upload) {
+         configuration = configurations.archives
+-        repositories.mavenDeployer {
++        repositories {
++            mavenDeployer {
+             repository url: "file://${projectDir}/../android/maven"
+             configureReactNativePom pom
++            }
+         }
+     }
+ }
+\ No newline at end of file
