@@ -22,10 +22,28 @@ const DetailRow = ({ label, value, valueStyle }) => (
 );
 
 const TransactionDetailScreen = ({ route, navigation }) => {
+  const detail = mockData.transactionDetail;
   const [transaction, setTransaction] = useState(null);
   const [account, setAccount] = useState(null);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  
+    console.log("transaction: ", transaction)
+  
+    const getCategory = async () => {
+      const fetchedCategory = await Category.findById(transaction.category_id);
+      console.log('found category: ', fetchedCategory);
+      
+      setCategory(fetchedCategory)
+    }
+  
+    useEffect(() => {
+      if (!transaction) {
+        return
+      }
+      getCategory()
+    }, [transaction?.id])
 
   // Get params from navigation
   const { transactionId, transaction: passedTransaction } = route.params || {};
@@ -95,6 +113,7 @@ const TransactionDetailScreen = ({ route, navigation }) => {
     return (
       <View style={styles.container}>
         <HeaderItem
+          category = {category}
           transaction={{ accountName: 'Chargement...' }}
           navigation={navigation}
         />
@@ -110,6 +129,7 @@ const TransactionDetailScreen = ({ route, navigation }) => {
     return (
       <View style={styles.container}>
         <HeaderItem
+          category = {category}
           transaction={{ accountName: 'Erreur' }}
           navigation={navigation}
         />
@@ -127,32 +147,22 @@ const TransactionDetailScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       {/* Header */}
       <HeaderItem
-        transaction={{
-          accountName: account?.name || 'Détails de la transaction',
-          phoneNumber: account?.phoneNumber,
-          balance: account?.balance
-        }}
+        category = {category}
+        transaction={transaction}
+        // transaction={{
+        //   accountName: account?.name || 'Détails de la transaction',
+        //   phoneNumber: account?.phoneNumber,
+        //   balance: account?.balance
+        // }}
         navigation={navigation}
       />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Transaction Type & Amount Section */}
-        <View style={styles.section}>
-          <View style={styles.transactionHeader}>
-            <View style={[styles.typeIcon, { backgroundColor: typeDisplay.color }]}>
-              <Text style={styles.typeIconText}>{typeDisplay.icon}</Text>
-            </View>
-            <View style={styles.transactionHeaderInfo}>
-              <Text style={styles.transactionType}>{typeDisplay.text}</Text>
-              <Text style={[styles.transactionAmount, { color: typeDisplay.color }]}>
-                {transaction.type === 'income' ? '+' : ''}{formatCurrency(transaction.amount)}
-              </Text>
-              {transaction.fees > 0 && (
-                <Text style={styles.feesText}>Frais: {formatCurrency(transaction.fees)}</Text>
-              )}
-            </View>
-          </View>
-        </View>
+        {/* <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Comptes mobile de la transaction</Text>
+          <AccountCard account={account} cardStyle={{width: '100%'}} />
+        </View> */}
 
         {/* Mobile Account Section */}
         {account && (
@@ -166,39 +176,10 @@ const TransactionDetailScreen = ({ route, navigation }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Détails de la transaction</Text>
           <View style={styles.detailsCard}>
-            <DetailRow 
-              label="Date" 
-              value={new Date(transaction.date).toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })} 
-            />
-            <DetailRow label="Montant" value={formatCurrency(transaction.amount)} />
-            {transaction.fees > 0 && (
-              <DetailRow label="Frais" value={formatCurrency(transaction.fees)} />
-            )}
-            <DetailRow 
-              label="Type" 
-              value={typeDisplay.text}
-              valueStyle={{ color: typeDisplay.color }}
-            />
-            <DetailRow 
-              label="Statut" 
-              value={statusDisplay.text}
-              valueStyle={{ color: statusDisplay.color }}
-            />
-            {transaction.transactionId && (
-              <DetailRow label="ID transaction" value={transaction.transactionId} />
-            )}
-            {transaction.description && (
-              <DetailRow label="Description" value={transaction.description} />
-            )}
-            {category && (
-              <DetailRow label="Catégorie" value={category.name} />
-            )}
+            <DetailRow label="Date" value={transaction.transactionDate} />
+            <DetailRow label="Frais" value={`${transaction.fees} FCFA`} />
+            <DetailRow label="Flux" value={transaction.flux} />
+            <DetailRow label="ID transaction" value={transaction.transactionId} />
           </View>
         </View>
 
@@ -219,13 +200,9 @@ const TransactionDetailScreen = ({ route, navigation }) => {
 
         {/* Additional Information */}
         <View style={styles.section}>
-          <View style={styles.infoCard}>
-            <Text style={styles.infoTitle}>💡 Informations</Text>
-            <Text style={styles.infoText}>
-              Cette transaction a été {transaction.status === 'completed' ? 'traitée avec succès' : 'enregistrée'} le{' '}
-              {new Date(transaction.date).toLocaleDateString('fr-FR')}.
-              {transaction.fees > 0 && ` Des frais de ${formatCurrency(transaction.fees)} ont été appliqués.`}
-            </Text>
+          <View style={styles.smsCard}>
+            <Text style={[styles.sectionTitle, {color: '#525252', fontStyle: 'italic', fontWeight: 400, fontSize: 13}]}>SMS d'origine</Text>
+            <Text style={styles.smsText}>{transaction.smsBody}</Text>
           </View>
         </View>
       </ScrollView>

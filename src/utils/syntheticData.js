@@ -13,12 +13,6 @@ export const createSyntheticData = async () => {
       console.log('🔁 Starting database transaction...');
       
       try {
-        // Clear existing data (optional, uncomment if needed)
-        // await db.query('DELETE FROM transactions');
-        // await db.query('DELETE FROM sms');
-        // await db.query('DELETE FROM accounts');
-        // await db.query('DELETE FROM categories');
-        
         // Create test accounts
         console.log('🔄 Creating test accounts...');
         const accounts = await createTestAccounts();
@@ -35,6 +29,7 @@ export const createSyntheticData = async () => {
         } else {
           console.log(`✅ Found ${categories.length} existing categories`);
         }
+        console.log("categories from synthetic data: ", categories)
         
         // Create test SMS messages
         console.log('🔄 Creating test SMS messages...');
@@ -47,7 +42,6 @@ export const createSyntheticData = async () => {
         console.log(`✅ Created ${transactions.length} transactions`);
         
         // Commit the transaction
-        // await tx.executeSql('COMMIT');
         console.log('✅ Database transaction committed');
         
         console.log('🎉 Synthetic data creation completed successfully!');
@@ -111,7 +105,7 @@ const createTestCategories = async () => {
         // Add ID and timestamps
         const categoryWithId = {
           ...categoryData,
-          id: uuidv4(),
+          // id: uuidv4(),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
@@ -132,18 +126,14 @@ const createTestCategories = async () => {
 const createTestAccounts = async () => {
   const accountsData = [
     {
-      name: 'Orange Money Principal',
-      phoneNumber: '+237694385414',
+      phoneNumber: '+237694385417',
       operatorName: 'Orange',
       currentBalance: 125000,
-      currency: 'FCFA'
     },
     {
-      name: 'MTN Mobile Money',
-      phoneNumber: '+237652385414',
+      phoneNumber: '+237652385418',
       operatorName: 'MTN',
       currentBalance: 85000,
-      currency: 'FCFA'
     },
   ];
 
@@ -153,13 +143,15 @@ const createTestAccounts = async () => {
       // Check if account already exists
       const existing = await Account.findByPhoneNumber(accountData.phoneNumber);
       if (!existing) {
+        console.log('Creating synthetic account:', accountData);
         const account = await Account.create(accountData);
         accounts.push(account);
       } else {
+        console.log('Account already exists:', accountData.phoneNumber);
         accounts.push(existing);
       }
     } catch (error) {
-      console.error('Error creating account:', error);
+      console.error('Error creating synthetic account:', error);
     }
   }
 
@@ -181,8 +173,12 @@ const createTestTransactions = async (accounts, categories, smsMessages) => {
 
   // Helper function to get random category by flux type
   const getRandomCategory = (flux) => {
-    const type = flux === 'in' ? 'revenu' : 'out' ? 'depense' : 'vir';
+    const type = flux === 'in' ? 'revenu' : 'out' ? 'depense' : 'virement';
     const filtered = categories.filter(cat => cat.type === type);
+    // console.log("categories: ", categories)
+    // console.log("filtered: ", filtered)
+    // console.log("type: ", type)
+    // console.log("random category: ", filtered[Math.floor(Math.random() * filtered.length)])
     return filtered[Math.floor(Math.random() * filtered.length)];
   };
 
@@ -224,7 +220,7 @@ const createTestTransactions = async (accounts, categories, smsMessages) => {
   // Create transactions for each account
   for (const account of accounts) {
     // Create 15-25 transactions per account
-    const numTransactions = 5 + Math.floor(Math.random() * 10);
+    const numTransactions = 2 + Math.floor(Math.random() * 10);
     
     for (let i = 0; i < numTransactions; i++) {
       const isIncoming = Math.random() > 0.6; // 40% incoming, 60% outgoing
@@ -250,12 +246,13 @@ const createTestTransactions = async (accounts, categories, smsMessages) => {
         flux: template.flux,
         categoryId: null, // Will be set after category selection
         smsId: null,
-        transactionDate: getRandomDate()
+        transactionDate: String(getRandomDate())
       };
 
       // Get a random category based on flux
       const category = getRandomCategory(template.flux);
       if (category) {
+        // console.log("category inserted in transaction: ", category)
         transactionData.categoryId = category.id;
       }
 
@@ -280,7 +277,7 @@ const createTestTransactions = async (accounts, categories, smsMessages) => {
   return transactions;
 };
 
-const createTestSMS = async (accounts) => {
+export const createTestSMS = async (accounts) => {
   const smsMessages = [];
   const now = new Date();
 

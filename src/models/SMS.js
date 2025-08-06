@@ -30,7 +30,8 @@ import { v4 as uuidv4 } from 'uuid';
  */
 class SMS {
   constructor(data = {}) {
-    this.id = data.id || uuidv4();
+    this.id = data.id || null;
+    // this.id = data.id || uuidv4();
     this.thread_id = data.thread_id || data.threadId || null;
     this.address = data.address || '';
     this.date = data.date || new Date().toISOString();

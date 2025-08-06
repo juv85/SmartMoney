@@ -5,7 +5,8 @@ import { getDatabase } from './index';
 
 class Category {
   constructor(data = {}) {
-    this.id = data.id || uuidv4();
+    this.id = data.id || null;
+    // this.id = data.id || uuidv4();
     this.name = data.name || '';
     this.type = data.type || 'depense'; // 'revenu', 'depense', or 'virement'
     this.createdAt = data.created_at || data.createdAt || new Date().toISOString();
@@ -239,6 +240,7 @@ class Category {
   }
 
   getTransactions(limit = 50, offset = 0) {
+    console.log('id cat: ', this.id)
     return new Promise((resolve, reject) => {
       const db = getDatabase(); // Ensure this function provides your SQLite DB instance
   

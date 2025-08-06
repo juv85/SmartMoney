@@ -20,7 +20,8 @@ import { getDatabase } from './index';
  */
 export default class Transaction {
   constructor(data = {}) {
-    this.id = data.id || uuidv4();
+    this.id = data.id || null;
+    // this.id = data.id || uuidv4();
     this.amount = data.amount || 0;
     this.fees = data.fees || 0;
     this.transactionId = data.transaction_id || data.transactionId || '';
@@ -38,11 +39,13 @@ export default class Transaction {
   static create(data) {
     const db = getDatabase();
     const model = new Transaction(data);
+    console.log('Data to create:', data);
+    console.log('Transaction to create:', model);
     return new Promise((resolve, reject) => {
       db.transaction(tx => {
         tx.executeSql(
-          `INSERT INTO transactions
-            (id, amount, fees, transaction_id, sms_body, flux, category_id, transaction_date, account_id, sms_id)
+          `INSERT INTO transactions 
+          (id, amount, fees, transaction_id, sms_body, flux, category_id, transaction_date, account_id, sms_id)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             model.id,
@@ -56,7 +59,9 @@ export default class Transaction {
             model.accountId,
             model.smsId
           ],
-          () => resolve(model),
+          (_, result) => {
+            console.log('transaction created', model)
+            resolve(model)},
           (_, error) => reject(error)
         );
       });

@@ -1,3 +1,5 @@
+import { imgDepot, imgPaiement, imgPhone, imgRetrait, imgTransfertEntrant, imgTransfertSortant } from "./images";
+
 export const formatCurrency = (amount, showCurrency=false) => {
     if (showCurrency) {
       return `${amount?.toLocaleString()} FCFA`;
@@ -18,6 +20,49 @@ export const formatCurrency = (amount, showCurrency=false) => {
     };
     return providers[provider] || providers.default;
   };
+
+  
+  export const getClassName = (category) => {
+    if (category?.name.toLowerCase() === 'incoming_transfer') {
+      return 'Transfer Entrant'
+    }
+    else if (category?.name.toLowerCase() === 'outgoing_transfer') {
+      return 'Transfer Sortant'
+    }
+    else if (category?.name.toLowerCase() === 'withdrawal') {
+      return 'Retrait'
+    }
+    else if (category?.name.toLowerCase() === 'deposit') {
+      return 'Depot'
+    }
+    else if (category?.name.toLowerCase() === 'mobile_payment') {
+      return 'Paiement'
+    }
+    else if (category?.name.toLowerCase() === 'phone_credit') {
+      return 'Telephone'
+    }
+  }
+
+  export const getClassIcon = (category) => {
+    if (category?.name.toLowerCase() === 'incoming_transfer') {
+      return imgTransfertEntrant
+    }
+    else if (category?.name.toLowerCase() === 'outgoing_transfer') {
+      return imgTransfertSortant
+    }
+    else if (category?.name.toLowerCase() === 'withdrawal') {
+      return imgRetrait
+    }
+    else if (category?.name.toLowerCase() === 'deposit') {
+      return imgDepot
+    }
+    else if (category?.name.toLowerCase() === 'mobile_payment') {
+      return imgPaiement
+    }
+    else if (category?.name.toLowerCase() === 'phone_credit') {
+      return imgPhone
+    }
+  }
   
   export const getCategoryColor = (category) => {
     const colors = {

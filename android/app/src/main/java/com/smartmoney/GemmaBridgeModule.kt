@@ -89,6 +89,7 @@ class GemmaBridgeModule(private val reactContext: ReactApplicationContext) :
                 val baseOptions = baseOptionsBuilder.build()
                 val options = LlmInference.LlmInferenceOptions.builder()
                         .setModelPath(actualPath)
+                        .setMaxTokens(2000)
                         .build()
 
                 // Load model

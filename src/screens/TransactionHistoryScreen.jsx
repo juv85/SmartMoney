@@ -9,56 +9,50 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { colors } from '../utils/colors';
-import { formatCurrency, formatPhoneNumber } from '../utils/formatters';
+import { formatCurrency, formatPhoneNumber, getClassIcon } from '../utils/formatters';
 import { mockData } from '../utils/mockData';
-import { imgFilter, imgRefresh } from '../utils/images';
+import { imgDepot, imgFilter, imgMoMo, imgOM, imgRefresh } from '../utils/images';
 import { Category, Transaction } from '../models';
 
 // New TransactionItem component for database transactions
 const TransactionItem = ({ transaction, onPress }) => {
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'income': return '#4ECDC4';
-      case 'expense': return '#FF6B6B';
-      case 'transfer': return '#45B7D1';
-      default: return '#74B9FF';
-    }
-  };
+  const [category, setCategory] = useState(null)
 
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'income': return '📥';
-      case 'expense': return '📤';
-      case 'transfer': return '🔄';
-      default: return '💰';
+  console.log("transaction: ", transaction)
+
+  const getCategory = async () => {
+    const fetchedCategory = await Category.findById(transaction.category_id);
+    console.log('found category: ', fetchedCategory);
+    
+    setCategory(fetchedCategory)
+  }
+
+  useEffect(() => {
+    if (!transaction) {
+      return
     }
-  };
+    getCategory()
+  }, [transaction.id])
 
   return (
     <TouchableOpacity style={styles.transactionItem} onPress={onPress}>
       <View style={styles.transactionLeft}>
-        <View style={[styles.transactionClass, { borderColor: getTypeColor(transaction.type) }]}>
-          <Text style={styles.typeIcon}>{getTypeIcon(transaction.type)}</Text>
+        <View style={styles.transactionClass}>
+          <Image source={getClassIcon(category)} style={styles.classIcon} />
         </View>
         <View style={styles.transactionInfo}>
-          <Text style={styles.transactionDescription}>
-            {transaction.description || transaction.recipientName || 'Transaction'}
-          </Text>
-          <Text style={styles.transactionDate}>
-            {new Date(transaction.date).toLocaleDateString('fr-FR', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </Text>
+          <View style={styles.providerNumber}>
+            <View style={[styles.providerIcon]}>
+              <Image style={styles.providerIcon} source={transaction?.account_operator_name?.toLowerCase() == 'orange' ? imgOM : imgMoMo } />
+              {/* <Text style={styles.providerIconText}>{getProviderIcon(transaction.provider)}</Text> */}
+            </View>
+            <Text style={styles.phoneNumber}>{formatPhoneNumber(transaction.account_phone_number)}</Text>
+          </View>
+          <Text style={styles.transactionDate}>{transaction.transaction_date}</Text>
         </View>
       </View>
       <View style={styles.transactionRight}>
-        <Text style={[styles.transactionAmount, { color: getTypeColor(transaction.type) }]}>
-          {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
-        </Text>
+        <Text style={styles.transactionAmount}>{formatCurrency(transaction.amount, true)}</Text>
         <Text style={styles.arrow}>›</Text>
       </View>
     </TouchableOpacity>
@@ -77,12 +71,13 @@ export const HeaderItem = ({ category, totalAmount, navigation, onRefresh }) => 
       <View style={{width: '100%', flexDirection: 'row', justifyContent: 'space-between'}} >
         <View style={styles.headerItemLeft}>
           <View style={styles.headerIcon}>
-            <Text style={styles.headerIconText}>{category?.icon || '📂'}</Text>
+            <Image source={getClassIcon(category)} style={styles.headerClassIcon} />
+            {/* <Text style={styles.headerIconText}>{getClassIcon(category) || ''}</Text> */}
           </View>
           <View>
             <Text style={styles.headerTitle}>{category?.name || 'Catégorie'}</Text>
             <Text style={styles.headerAmount}>
-              {formatCurrency(totalAmount)}
+              {formatCurrency(totalAmount, true)}
             </Text>
           </View>
         </View>
@@ -102,12 +97,20 @@ const TransactionHistoryScreen = ({ route, navigation }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { categoryId, categoryName } = route.params || {};
+  const { categoryId, categoryName, accountId, phoneNumber } = route.params || {};
 
   useEffect(() => {
     console.log("catId: ", categoryId)
     loadCategoryData();
   }, []);
+
+  const loadAccountData = useCallback(async () => {
+    try {
+      
+    } catch (error) {
+      
+    }
+  }, [accountId])
 
   const loadCategoryData = useCallback(async () => {
      try {
@@ -115,14 +118,15 @@ const TransactionHistoryScreen = ({ route, navigation }) => {
  
        if (categoryId) {
          const categoryData = await Category.findById(categoryId);
+         console.log('categoryData :>> ', categoryData);
          setCategory(categoryData);
- 
-         // const categoryTransactions = await Transaction.findAll({
-         //   categoryId: categoryId
-         // });
-         const categoryTransactions = await Transaction.findAll({
-           categoryId: categoryId,
-         });
+        //  console.log("categ id: ", categoryId)
+        //  let cat = new Category({id: "129f16f3-a493-4289-8291-5d16c13b09bb"})
+         let cat = new Category({id: categoryId})
+         const categoryTransactions = await cat.getTransactions();
+        //  const categoryTransactions = await Transaction.findAll({
+        //    categoryId: categoryId,
+        //  });
        console.log("cat transactions: ", categoryTransactions)
        setTransactions(categoryTransactions);
        } else {
@@ -154,7 +158,7 @@ const TransactionHistoryScreen = ({ route, navigation }) => {
     return (
       <View style={styles.container}>
         <HeaderItem 
-          category={{ name: categoryName || 'Chargement...' }}
+          category={{ name: category?.name || accountId && phoneNumber || 'Chargement...' }}
           totalAmount={0}
           navigation={navigation}
           onRefresh={handleRefresh}
@@ -171,7 +175,7 @@ const TransactionHistoryScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       {/* Header with category info */}
       <HeaderItem 
-        category={category || { name: categoryName || 'Toutes les transactions' }}
+        category={category || { name: categoryName || accountId && formatPhoneNumber(phoneNumber) || 'Toutes les transactions' }}
         totalAmount={categoryTotal}
         navigation={navigation}
         onRefresh={handleRefresh}
@@ -229,11 +233,20 @@ const styles = StyleSheet.create({
   headerIcon: {
     width: 45,
     height: 45,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    // backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: '#FFD3BC',
+    borderWidth: 2,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 22
     // marginBottom: 15,
+  },
+  headerClassIcon: {
+    width: 30,
+    height: 30,
+    margin: 10,
+    tintColor: '#fff'
   },
   headerIconText: {
     fontSize: 24,

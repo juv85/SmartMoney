@@ -1,3 +1,5 @@
+import { createSyntheticData } from "../utils/syntheticData";
+
 // Database schema definitions
 export const createTables = (db) => {
   return new Promise((resolve, reject) => {
@@ -14,7 +16,7 @@ export const createTables = (db) => {
 
       // Categories table
       `CREATE TABLE IF NOT EXISTS categories (
-        id TEXT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
         type TEXT NOT NULL CHECK (type IN ('revenu', 'depense', 'virement')),
         color TEXT,
@@ -26,7 +28,7 @@ export const createTables = (db) => {
       
       // SMS table
       `CREATE TABLE IF NOT EXISTS sms (
-        id TEXT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         thread_id INTEGER,
         address TEXT,
         date DATETIME,
@@ -52,7 +54,7 @@ export const createTables = (db) => {
 
       // Transactions table
       `CREATE TABLE IF NOT EXISTS transactions (
-        id TEXT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         amount REAL NOT NULL,
         fees REAL DEFAULT 0,
         transaction_id TEXT UNIQUE NOT NULL,
@@ -96,43 +98,47 @@ export const createTables = (db) => {
         }
         
         // Insert default categories
-        await insertDefaultCategories(db);
+        // await insertDefaultCategories(db);
         resolve();
       } catch (error) {
         reject(error);
       }
     };
 
+    createSyntheticData()
+
     executeQueries();
   });
 };
 
+
+
 // Insert default categories
-const insertDefaultCategories = (db) => {
-  return new Promise((resolve, reject) => {
-    const defaultCategories = [
-      { name: 'phone_credit', type: 'depense' },
-      { name: 'incoming_transfer', type: 'revenu' },
-      { name: 'outgoing_transfer', type: 'depense' },
-      { name: 'withdrawal', type: 'virement' },
-      { name: 'deposit', type: 'virement' }
-    ];
+// const insertDefaultCategories = (db) => {
+//   return new Promise((resolve, reject) => {
+//     const defaultCategories = [
+//       { name: 'phone_credit', type: 'depense' },
+//       { name: 'incoming_transfer', type: 'revenu' },
+//       { name: 'outgoing_transfer', type: 'depense' },
+//       { name: 'withdrawal', type: 'virement' },
+//       { name: 'deposit', type: 'virement' }
+//     ];
 
-    const insertCategory = (category) => {
-      return new Promise((resolveInsert, rejectInsert) => {
-        db.transaction(tx => {
-          tx.executeSql(
-            'INSERT OR IGNORE INTO categories (name, type, color, icon, is_default) VALUES (?, ?, ?, ?, 1)',
-            [category.name, category.type, category.color, category.icon],
-            () => resolveInsert(),
-            (_, error) => rejectInsert(error)
-          );
-        });
-      });
-    };
+//     const insertCategory = (category) => {
+//       return new Promise((resolveInsert, rejectInsert) => {
+//         db.transaction(tx => {
+//           tx.executeSql(
+//             'INSERT OR IGNORE INTO categories (name, type, color, icon, is_default) VALUES (?, ?, ?, ?, 1)',
+//             [category.name, category.type, category.color, category.icon],
+//             () => resolveInsert(),
+//             (_, error) => rejectInsert(error)
+//           );
+//         });
+//       });
+//     };
 
-    Promise.all(defaultCategories.map(insertCategory))
-      .then(() => resolve())
-      .catch(error => reject(error));
-  });
-};
+//     Promise.all(defaultCategories.map(insertCategory))
+//       .then(() => resolve())
+//       .catch(error => reject(error));
+//   });
+// };

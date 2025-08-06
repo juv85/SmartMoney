@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -16,16 +16,22 @@ const ClassItem = ({ category, onPress }) => {
   const categoryTextColor = getCategoryTextColor(category.type);
   const categoryText = category.type === 'revenu' ? 'Revenu' : 
                      category.type === 'virement' ? 'Virement' : 'Dépense';
+  const categoryId = category.id
+
+  const [transactions, setTransactions] = useState([]);
+  // console.log('key---', category.id)
   
   useEffect(()=> {
-    if (!category) {
-      return
-    }
-    async function getTransactions() {
-      let category = await Category.findById(category.id)
-      console.log('category id', category.id)
-      // let transactions = await category.getTransactions()
-      // console.log('category transactions', transactions)
+      if (!category) {
+        return
+      }
+      async function getTransactions() {
+        let category = new Category({id: categoryId})
+        // let category = await Category.findById(category.id)
+        // console.log('category', category)
+        let transactions = await category.getTransactions()
+        setTransactions(transactions)
+        // console.log('category transactions', transactions)
     }
     getTransactions()
   }, [category])
@@ -82,7 +88,7 @@ const getClassName = (category) => {
         </View>
         <View style={styles.transactionInfo}>
           <Text style={styles.transactionTitle}>{getClassName(category)}</Text>
-          <Text style={styles.transactionAmount}>{formatCurrency(category.amount, true)}</Text>
+          <Text style={styles.transactionAmount}>{formatCurrency(transactions.reduce((total, transaction) => total + transaction.amount, 0), true)}</Text>
         </View>
       </View>
       <View style={styles.transactionRight}>

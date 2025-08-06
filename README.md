@@ -126,24 +126,6 @@ export const mockData = {
 3. **Spending Insights** - In `HomeScreen.jsx`, for generating financial insights
 4. **Fraud Detection** - In transaction processing for security alerts
 
-### Example Integration
-```javascript
-// Example AI processing function
-const processTransactionWithAI = async (smsText) => {
-  // Show loading screen
-  setIsProcessing(true);
-  
-  try {
-    // Call your Gemma 3n API
-    const analysis = await analyzeTransactionSMS(smsText);
-    return analysis;
-  } catch (error) {
-    console.error('AI processing error:', error);
-  } finally {
-    setIsProcessing(false);
-  }
-};
-```
 
 ## 📱 Running the App
 
@@ -176,4 +158,4 @@ This app showcases Gemma 3n usage through:
 ## 🐛 Troubleshooting
 
 ### Common Issues
-1. **Navigation errors
+1. **Performance issues** - End device requires at least 8Gb RAM with GPU support.

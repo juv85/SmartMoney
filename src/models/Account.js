@@ -21,7 +21,7 @@ class Account {
 
       db.transaction(tx => {
         tx.executeSql(
-          'INSERT INTO accounts (phoneNumber, operatorName, currentBalance) VALUES (?, ?, ?)',
+          'INSERT INTO accounts (phone_number, operator_name, current_balance) VALUES (?, ?, ?)',
           [account.phoneNumber, account.operatorName, account.currentBalance],
           (_, result) => {
             // Get the inserted row to ensure we have all fields
@@ -103,9 +103,8 @@ class Account {
   static findAll(activeOnly = false) {
     return new Promise((resolve, reject) => {
       const db = getDatabase();
-      const query = activeOnly 
-        ? 'SELECT * FROM accounts WHERE is_active = 1 ORDER BY created_at DESC'
-        : 'SELECT * FROM accounts ORDER BY created_at DESC';
+      // Note: activeOnly parameter ignored since schema doesn't have is_active column
+      const query = 'SELECT * FROM accounts ORDER BY created_at DESC';
 
       db.transaction(tx => {
         tx.executeSql(
@@ -140,17 +139,18 @@ class Account {
       // Update local properties
       Object.keys(updateData).forEach(key => {
         if (key === 'phone_number') this.phoneNumber = updateData[key];
-        else if (key === 'is_active') this.isActive = updateData[key];
+        else if (key === 'operator_name') this.operatorName = updateData[key];
+        else if (key === 'current_balance') this.currentBalance = updateData[key];
         else if (this.hasOwnProperty(key)) this[key] = updateData[key];
       });
 
       db.transaction(tx => {
         tx.executeSql(
           `UPDATE accounts SET 
-           name = ?, phone_number = ?, provider = ?, balance = ?, 
-           currency = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP 
+           phone_number = ?, operator_name = ?, current_balance = ?, 
+           updated_at = CURRENT_TIMESTAMP 
            WHERE id = ?`,
-          [this.name, this.phoneNumber, this.provider, this.balance, this.currency, this.isActive, this.id],
+          [this.phoneNumber, this.operatorName, this.currentBalance, this.id],
           (_, result) => {
             if (result.rowsAffected > 0) {
               resolve(this);
@@ -169,22 +169,15 @@ class Account {
 
   // Update balance
   updateBalance(newBalance) {
-    return this.update({ balance: newBalance });
+    return this.update({ current_balance: newBalance });
   }
 
-  // Deactivate account
-  deactivate() {
-    return this.update({ is_active: false });
-  }
-
-  // Activate account
-  activate() {
-    return this.update({ is_active: true });
-  }
-
-  // Delete account (soft delete by deactivating)
+  // Note: The current schema doesn't support is_active field
+  // These methods are kept for future compatibility but will need schema updates
+  
+  // Delete account (hard delete since no soft delete support in current schema)
   delete() {
-    return this.deactivate();
+    return Account.hardDelete(this.id);
   }
 
   // Hard delete account
