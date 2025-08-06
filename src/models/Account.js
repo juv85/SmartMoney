@@ -21,7 +21,7 @@ class Account {
 
       db.transaction(tx => {
         tx.executeSql(
-          'INSERT INTO accounts (phone_number, operator_name, current_balance) VALUES (?, ?, ?)',
+          'INSERT INTO accounts (phoneNumber, operatorName, currentBalance) VALUES (?, ?, ?)',
           [account.phoneNumber, account.operatorName, account.currentBalance],
           (_, result) => {
             // Get the inserted row to ensure we have all fields

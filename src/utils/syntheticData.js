@@ -1,5 +1,6 @@
 // Synthetic data generator for testing models
 import { Account, Category, Transaction, SMS } from '../models';
+import { v4 as uuidv4 } from 'uuid';
 
 export const createSyntheticData = async () => {
   // const db = require('../models').default;
@@ -23,14 +24,16 @@ export const createSyntheticData = async () => {
         const accounts = await createTestAccounts();
         console.log(`✅ Created ${accounts.length} accounts`);
         
-        // Get all categories (should be created by schema.js)
-        console.log('🔄 Fetching categories...');
-        const categories = await Category.findAll();
-        console.log(categories)
+        // Create or get test categories
+        console.log('🔄 Setting up categories...');
+        let categories = await Category.findAll();
+        
         if (categories.length === 0) {
-          console.warn('⚠️ No categories found. Please ensure the database is properly initialized.');
+          console.log('ℹ️ No categories found, creating test categories...');
+          categories = await createTestCategories();
+          console.log(`✅ Created ${categories.length} test categories`);
         } else {
-          console.log(`✅ Found ${categories.length} categories`);
+          console.log(`✅ Found ${categories.length} existing categories`);
         }
         
         // Create test SMS messages
@@ -67,20 +70,79 @@ export const createSyntheticData = async () => {
   }
 };
 
+// Create test categories with proper types and icons
+const createTestCategories = async () => {
+  const categories = [
+    // Income categories
+    { 
+      name: 'Incoming_transfer', 
+      type: 'revenu',
+    },
+    
+    // Expense categories
+    { 
+      name: 'Outgoing_transfer', 
+      type: 'depense', 
+    },
+    { 
+      name: 'Phone_credit', 
+      type: 'depense', 
+    },
+    
+    // Transfer categories
+    { 
+      name: 'Deposit', 
+      type: 'virement', 
+    },
+    { 
+      name: 'Withdrawal', 
+      type: 'virement', 
+    },
+  ];
+
+  const createdCategories = [];
+  
+  for (const categoryData of categories) {
+    try {
+      // Check if category already exists
+      const existing = await Category.findByName(categoryData.name);
+      
+      if (!existing) {
+        // Add ID and timestamps
+        const categoryWithId = {
+          ...categoryData,
+          id: uuidv4(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        const category = await Category.create(categoryWithId);
+        createdCategories.push(category);
+      } else {
+        createdCategories.push(existing);
+      }
+    } catch (error) {
+      console.error(`Error creating category ${categoryData.name}:`, error);
+    }
+  }
+
+  return createdCategories;
+};
+
 const createTestAccounts = async () => {
   const accountsData = [
     {
       name: 'Orange Money Principal',
       phoneNumber: '+237694385414',
-      provider: 'Orange',
-      balance: 125000,
+      operatorName: 'Orange',
+      currentBalance: 125000,
       currency: 'FCFA'
     },
     {
       name: 'MTN Mobile Money',
       phoneNumber: '+237652385414',
-      provider: 'MTN',
-      balance: 85000,
+      operatorName: 'MTN',
+      currentBalance: 85000,
       currency: 'FCFA'
     },
   ];
@@ -119,7 +181,7 @@ const createTestTransactions = async (accounts, categories, smsMessages) => {
 
   // Helper function to get random category by flux type
   const getRandomCategory = (flux) => {
-    const type = flux === 'in' ? 'income' : 'expense';
+    const type = flux === 'in' ? 'revenu' : 'out' ? 'depense' : 'vir';
     const filtered = categories.filter(cat => cat.type === type);
     return filtered[Math.floor(Math.random() * filtered.length)];
   };
@@ -130,9 +192,9 @@ const createTestTransactions = async (accounts, categories, smsMessages) => {
       flux: 'in',
       amounts: [25000, 50000, 75000, 100000, 15000],
       smsBodies: [
-        'Vous avez reçu {amount} FCFA de {sender}. Nouveau solde: {balance} FCFA.',
-        'Transfert de {amount} FCFA reçu de {sender}. Solde: {balance} FCFA.',
-        'Reçu {amount} FCFA de {sender}. Solde actuel: {balance} FCFA.'
+        'Transfert recu de {amount} FCFA du 656854878. Nouveau solde: {balance} FCFA.',
+        'Transfert de {amount} FCFA reçu du 698488451. Solde: {balance} FCFA.',
+        'Reçu {amount} FCFA de 656565141. Solde actuel: {balance} FCFA.'
       ],
       senders: ['Papa', 'Employeur', 'Client', 'Ami', 'Famille']
     },
@@ -141,18 +203,28 @@ const createTestTransactions = async (accounts, categories, smsMessages) => {
       flux: 'out',
       amounts: [5000, 10000, 15000, 25000, 3000, 8000],
       smsBodies: [
-        'Vous avez envoyé {amount} FCFA à {recipient}. Frais: {fees} FCFA. Nouveau solde: {balance} FCFA.',
-        'Transfert de {amount} FCFA effectué vers {recipient}. Frais: {fees} FCFA. Solde: {balance} FCFA.',
-        'Paiement de {amount} FCFA à {recipient}. Frais: {fees} FCFA. Solde actuel: {balance} FCFA.'
+        'Vous avez envoyé {amount} FCFA au 694521358. Frais: {fees} FCFA. Nouveau solde: {balance} FCFA.',
+        'Transfert de {amount} FCFA effectué vers 656856598. Frais: {fees} FCFA. Solde: {balance} FCFA.',
+        'Paiement de {amount} FCFA de Orange Bundle. Solde actuel: {balance} FCFA.'
       ],
       recipients: ['Maman', 'Orange', 'EDG', 'ATM', 'Service', 'Marché']
+    },
+    // Virement transactions
+    {
+      flux: 'out',
+      amounts: [5000, 10000, 15000, 25000, 3000, 8000],
+      smsBodies: [
+        'Vous avez fait un depot de {amount} FCFA. Frais: {fees} FCFA. Nouveau solde: {balance} FCFA.',
+        'Retrait de {amount} FCFA effectué. Frais: {fees} FCFA. Solde: {balance} FCFA.',
+      ],
+      recipients: ['Orange', 'MTN']
     }
   ];
 
   // Create transactions for each account
   for (const account of accounts) {
     // Create 15-25 transactions per account
-    const numTransactions = 15 + Math.floor(Math.random() * 10);
+    const numTransactions = 5 + Math.floor(Math.random() * 10);
     
     for (let i = 0; i < numTransactions; i++) {
       const isIncoming = Math.random() > 0.6; // 40% incoming, 60% outgoing
@@ -284,33 +356,6 @@ const createTestSMS = async (accounts) => {
         sub_id: -1,
         creator: 'com.android.messaging',
         seen: 1,
-        account_id: account.id,
-        account_icc_id: null,
-        account_name: account.name,
-        account_number: account.phoneNumber,
-        account_type: account.provider.toLowerCase(),
-        account_color: account.provider === 'Orange' ? '#FF6D00' : '#FFCC00',
-        account_color_dark: account.provider === 'Orange' ? '#E65100' : '#F57F17',
-        account_color_light: account.provider === 'Orange' ? '#FFB74D' : '#FFEE58',
-        account_color_accent: account.provider === 'Orange' ? '#FF9800' : '#FFD600',
-        account_color_text: '#000000',
-        account_color_text_secondary: '#757575',
-        account_color_text_tertiary: '#9E9E9E',
-        account_color_text_quaternary: '#BDBDBD',
-        account_color_text_hint: '#9E9E9E',
-        account_color_text_link: '#1976D2',
-        account_color_text_primary: '#212121',
-        account_color_primary: account.provider === 'Orange' ? '#FF6D00' : '#FFCC00',
-        account_color_primary_dark: account.provider === 'Orange' ? '#E65100' : '#F57F17',
-        account_color_primary_light: account.provider === 'Orange' ? '#FFB74D' : '#FFEE58',
-        account_color_accent: account.provider === 'Orange' ? '#FF9800' : '#FFD600',
-        account_color_primary_text: '#212121',
-        account_color_secondary_text: '#757575',
-        account_color_icons: '#212121',
-        account_color_divider: '#BDBDBD',
-        is_processed: Math.random() > 0.3, // 70% processed
-        processed_at: Math.random() > 0.3 ? new Date().toISOString() : null,
-        raw_data: JSON.stringify({ template: template.address, index: i })
       };
 
       try {

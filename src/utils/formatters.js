@@ -1,13 +1,13 @@
 export const formatCurrency = (amount, showCurrency=false) => {
     if (showCurrency) {
-      return `${amount.toLocaleString()} FCFA`;
+      return `${amount?.toLocaleString()} FCFA`;
     }
-    return `${amount.toLocaleString()}`;
+    return `${amount?.toLocaleString()}`;
   };
   
   export const formatPhoneNumber = (number) => {
     // Format phone number to display format
-    return number.replace(/(\+237)(\d{3})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+    return number?.replace(/(\+237)(\d{3})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
   };
   
   export const getProviderIcon = (provider) => {
@@ -22,20 +22,20 @@ export const formatCurrency = (amount, showCurrency=false) => {
   export const getCategoryColor = (category) => {
     const colors = {
       // revenue: '#4CAF50',
-      revenue: '#F4FFF5',
+      revenu: '#F4FFF5',
       // transfer: '#FF9800',
-      transfer: '#FFF8F0',
+      virement: '#FFF8F0',
       // expense: '#F44336',
-      expense: '#FFF3F4',
+      depense: '#FFF3F4',
     };
     return colors[category] || '#9E9E9E';
   };
   
   export const getCategoryTextColor = (category) => {
     const colors = {
-      revenue: '#28A85C',
-      transfer: '#FF8300',
-      expense: '#F60419',
+      revenu: '#28A85C',
+      virement: '#FF8300',
+      depense: '#F60419',
     };
     return colors[category] || '#9E9E9E';
   };

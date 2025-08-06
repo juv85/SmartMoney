@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect } from 'react'
+import { imgBubbles } from '../utils/images'
 
 const LoadingScreen = ({navigation}) => {
   useEffect(() => {
@@ -12,6 +13,7 @@ const LoadingScreen = ({navigation}) => {
 
   return (
     <View>
+      <Image source={imgBubbles} style={styles.loader} />
       <Text>Display loading animation</Text>
     </View>
   )
@@ -19,4 +21,9 @@ const LoadingScreen = ({navigation}) => {
 
 export default LoadingScreen
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  loader: {
+    width: 300,
+    height: 300
+  }
+})

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -105,33 +105,38 @@ const TransactionHistoryScreen = ({ route, navigation }) => {
   const { categoryId, categoryName } = route.params || {};
 
   useEffect(() => {
+    console.log("catId: ", categoryId)
     loadCategoryData();
-  }, [categoryId]);
+  }, []);
 
-  const loadCategoryData = async () => {
-    try {
-      setLoading(true);
+  const loadCategoryData = useCallback(async () => {
+     try {
+       setLoading(true);
+ 
+       if (categoryId) {
+         const categoryData = await Category.findById(categoryId);
+         setCategory(categoryData);
+ 
+         // const categoryTransactions = await Transaction.findAll({
+         //   categoryId: categoryId
+         // });
+         const categoryTransactions = await Transaction.findAll({
+           categoryId: categoryId,
+         });
+       console.log("cat transactions: ", categoryTransactions)
+       setTransactions(categoryTransactions);
+       } else {
+         const allTransactions = await Transaction.findAll({ limit: 100 });
+         setTransactions(allTransactions);
+       }
+     } catch (error) {
+       console.error('Error loading category data:', error);
+       setTransactions(mockData.transactions || []);
+     } finally {
+       setLoading(false);
+     }
+   }, [categoryId])
 
-      if (categoryId) {
-        const categoryData = await Category.findById(categoryId);
-        setCategory(categoryData);
-
-        const categoryTransactions = await Transaction.findAll({
-          categoryId: categoryId,
-          limit: 100,
-        });
-        setTransactions(categoryTransactions);
-      } else {
-        const allTransactions = await Transaction.findAll({ limit: 100 });
-        setTransactions(allTransactions);
-      }
-    } catch (error) {
-      console.error('Error loading category data:', error);
-      setTransactions(mockData.transactions || []);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleTransactionPress = (transaction) => {
     navigation.navigate('TransactionDetail', { 

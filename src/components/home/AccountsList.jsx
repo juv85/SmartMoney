@@ -23,12 +23,12 @@ export const AccountCard = ({ account, cardStyle, onPress }) => {
       <View style={styles.accountHeader}>
         {/* <View style={[styles.providerIcon, { backgroundColor: getProviderColor(account.provider) }]}> */}
         <View style={[styles.providerIcon]}>
-          <Image style={styles.providerIcon} source={account?.provider?.toLowerCase() == 'orange' ? imgOM : imgMoMo } />
+          <Image style={styles.providerIcon} source={account?.operatorName?.toLowerCase() == 'orange' ? imgOM : imgMoMo } />
           {/* <Text style={styles.providerIconText}>{getProviderIcon(account.provider)}</Text> */}
         </View>
         <View style={styles.accountInfo}>
-          <Text style={styles.accountNumber}>{formatPhoneNumber(account?.number || account?.phoneNumber)}</Text>
-          <Text style={styles.accountName}>{account?.name || account?.accountName}</Text>
+          <Text style={styles.accountNumber}>{formatPhoneNumber(account?.phoneNumber)}</Text>
+          <Text style={styles.accountName}>{account?.operatorName}</Text>
         </View>
       </View>
     </View>

@@ -20,9 +20,9 @@ class Category {
 
       db.transaction(tx => {
         tx.executeSql(
-          `INSERT INTO categories (name, type, color, icon, is_default) 
-           VALUES (?, ?, ?, ?, ?)`,
-          [category.name, category.type, category.color, category.icon, category.isDefault],
+          `INSERT INTO categories (name, type) 
+           VALUES (?, ?)`,
+          [category.name, category.type],
           (_, result) => {
             category.id = result.insertId;
             resolve(category);
@@ -93,7 +93,7 @@ class Category {
     return new Promise((resolve, reject) => {
       const db = getDatabase();
       let query = 'SELECT * FROM categories ORDER BY name ASC';
-      let params = [''];
+      let params = [];
 
       if (type) {
         query = 'SELECT * FROM categories WHERE type = ? ORDER BY name ASC';
@@ -106,8 +106,10 @@ class Category {
           params,
           (_, result) => {
             const categories = [];
-            for (let i = 0; i < result.rows.length; i++) {
-              categories.push(new Category(result.rows.item(i)));
+            if (result.rows.length > 0) {
+              for (let i = 0; i < result.rows.length; i++) {
+                categories.push(new Category(result.rows.item(i)));
+              }
             }
             resolve(categories);
           },
@@ -236,18 +238,24 @@ class Category {
     });
   }
 
-  // Get transactions for this category
   getTransactions(limit = 50, offset = 0) {
     return new Promise((resolve, reject) => {
-      const db = getDatabase();
-
+      const db = getDatabase(); // Ensure this function provides your SQLite DB instance
+  
       db.transaction(tx => {
         tx.executeSql(
-          `SELECT t.*, a.name as account_name, a.phone_number 
-           FROM transactions t 
-           LEFT JOIN accounts a ON t.account_id = a.id 
-           WHERE t.category_id = ? 
-           ORDER BY t.date DESC 
+          `SELECT
+             t.*,
+             a.phone_number as account_phone_number,
+             a.operator_name as account_operator_name
+           FROM
+             transactions t
+           LEFT JOIN
+             accounts a ON t.account_id = a.id
+           WHERE
+             t.category_id = ?
+           ORDER BY
+             t.transaction_date DESC
            LIMIT ? OFFSET ?`,
           [this.id, limit, offset],
           (_, result) => {
@@ -260,6 +268,7 @@ class Category {
           (_, error) => {
             console.error('Error fetching category transactions:', error);
             reject(error);
+            return true; // Indicate that the error was handled
           }
         );
       });

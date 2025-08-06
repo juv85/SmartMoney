@@ -31,6 +31,7 @@ const TransactionDetailScreen = ({ route, navigation }) => {
   const { transactionId, transaction: passedTransaction } = route.params || {};
 
   useEffect(() => {
+    console.log('transaction.id :>> ', transactionId);
     loadTransactionDetails();
   }, [transactionId]);
 

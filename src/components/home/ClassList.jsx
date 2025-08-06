@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,31 +9,66 @@ import {
 import { colors } from '../../utils/colors';
 import { formatCurrency, getCategoryColor, getCategoryTextColor, getTransactionIcon } from '../../utils/formatters';
 import { imgDepot, imgPaiement, imgPhone, imgRetrait, imgTransfertEntrant, imgTransfertSortant } from '../../utils/images';
+import Category from '../../models/Category';
 
-const TransactionItem = ({ transaction, onPress }) => {
-  const categoryColor = getCategoryColor(transaction.category);
-  const categoryTextColor = getCategoryTextColor(transaction.category);
-  const categoryText = transaction.category === 'revenue' ? 'Revenu' : 
-                     transaction.category === 'transfer' ? 'Virement' : 'Dépense';
+const ClassItem = ({ category, onPress }) => {
+  const categoryColor = getCategoryColor(category.type);
+  const categoryTextColor = getCategoryTextColor(category.type);
+  const categoryText = category.type === 'revenu' ? 'Revenu' : 
+                     category.type === 'virement' ? 'Virement' : 'Dépense';
+  
+  useEffect(()=> {
+    if (!category) {
+      return
+    }
+    async function getTransactions() {
+      let category = await Category.findById(category.id)
+      console.log('category id', category.id)
+      // let transactions = await category.getTransactions()
+      // console.log('category transactions', transactions)
+    }
+    getTransactions()
+  }, [category])
 
-const getClassIcon = (transaction) => {
-  if (transaction.type === 'incoming_transfer') {
+const getClassIcon = (category) => {
+  if (category?.name.toLowerCase() === 'incoming_transfer') {
     return imgTransfertEntrant
   }
-  else if (transaction.type === 'outgoing_transfer') {
+  else if (category?.name.toLowerCase() === 'outgoing_transfer') {
     return imgTransfertSortant
   }
-  else if (transaction.type === 'withdrawal') {
+  else if (category?.name.toLowerCase() === 'withdrawal') {
     return imgRetrait
   }
-  else if (transaction.type === 'deposit') {
+  else if (category?.name.toLowerCase() === 'deposit') {
     return imgDepot
   }
-  else if (transaction.type === 'mobile_payment') {
+  else if (category?.name.toLowerCase() === 'mobile_payment') {
     return imgPaiement
   }
-  else if (transaction.type === 'phone_credit') {
+  else if (category?.name.toLowerCase() === 'phone_credit') {
     return imgPhone
+  }
+}
+
+const getClassName = (category) => {
+  if (category?.name.toLowerCase() === 'incoming_transfer') {
+    return 'Transfer Entrant'
+  }
+  else if (category?.name.toLowerCase() === 'outgoing_transfer') {
+    return 'Transfer Sortant'
+  }
+  else if (category?.name.toLowerCase() === 'withdrawal') {
+    return 'Retrait'
+  }
+  else if (category?.name.toLowerCase() === 'deposit') {
+    return 'Depot'
+  }
+  else if (category?.name.toLowerCase() === 'mobile_payment') {
+    return 'Paiement'
+  }
+  else if (category?.name.toLowerCase() === 'phone_credit') {
+    return 'Telephone'
   }
 }
 
@@ -43,11 +78,11 @@ const getClassIcon = (transaction) => {
         <View style={[styles.transactionIcon]}>
         {/* <View style={[styles.transactionIcon, { backgroundColor: `${categoryColor}20` }]}> */}
           {/* <Text style={styles.transactionIconText}>{getTransactionIcon(transaction.type)}</Text> */}
-          <Image source={getClassIcon(transaction)} />
+          <Image source={getClassIcon(category)} />
         </View>
         <View style={styles.transactionInfo}>
-          <Text style={styles.transactionTitle}>{transaction.title}</Text>
-          <Text style={styles.transactionAmount}>{formatCurrency(transaction.amount, true)}</Text>
+          <Text style={styles.transactionTitle}>{getClassName(category)}</Text>
+          <Text style={styles.transactionAmount}>{formatCurrency(category.amount, true)}</Text>
         </View>
       </View>
       <View style={styles.transactionRight}>
@@ -60,9 +95,9 @@ const getClassIcon = (transaction) => {
   );
 };
 
-const TransactionsList = ({ transactions, navigation }) => {
-  const handleTransactionPress = (transaction) => {
-    navigation.navigate('TransactionHistory', {categoryId: transaction.categoryId});
+const ClassList = ({ categories, navigation }) => {
+  const handleClassPress = (category) => {
+    navigation.navigate('TransactionHistory', {categoryId: category.id});
 
     // if (transaction.type === 'phone_credit') {
     //   navigation.navigate('TransactionHistory');
@@ -75,11 +110,11 @@ const TransactionsList = ({ transactions, navigation }) => {
 
   return (
     <View style={styles.container}>
-      {transactions.map((transaction) => (
-        <TransactionItem
-          key={transaction.id}
-          transaction={transaction}
-          onPress={() => handleTransactionPress(transaction)}
+      {categories?.map((category) => (
+        <ClassItem
+          key={category.id}
+          category={category}
+          onPress={() => handleClassPress(category)}
         />
       ))}
     </View>
@@ -156,4 +191,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TransactionsList;
+export default ClassList;

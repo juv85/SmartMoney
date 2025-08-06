@@ -15,13 +15,14 @@ import { formatCurrency } from '../utils/formatters';
 import { mockData } from '../utils/mockData';
 import SummaryCards from '../components/home/SummaryCards';
 import AccountsList from '../components/home/AccountsList';
-import TransactionsList from '../components/home/TransactionsList';
+import ClassList from '../components/home/ClassList';
 import { imgFilter, imgRefresh } from '../utils/images';
 import { Account, Transaction, Category } from '../models';
 import { createSyntheticData, testModelFunctions } from '../utils/syntheticData';
 
 const HomeScreen = ({ navigation }) => {
   const [accounts, setAccounts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(mockData.summary);
@@ -44,7 +45,8 @@ const HomeScreen = ({ navigation }) => {
       setTransactions(recentTransactions.length > 0 ? recentTransactions : mockData.transactions);
       console.log('recentTransactions', recentTransactions)
 
-      const categories = await Category.findAll('deposit');
+      const categories = await Category.findAll();
+      setCategories(categories.length > 0 ? categories : mockData.categories);
       console.log("categories", categories)
       // Calculate summary from real data if available
       // if (recentTransactions.length > 0) {
@@ -169,8 +171,8 @@ const HomeScreen = ({ navigation }) => {
         {/* Usage Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Votre utilisation</Text>
-          <TransactionsList 
-            transactions={transactions} 
+          <ClassList 
+            categories={categories} 
             navigation={navigation}
           />
         </View>
